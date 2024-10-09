@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Photo Editor</title>
+    <style>
+      /*  Basic CSS styling - you'll likely want to expand on this */
+      #canvas {
+        border: 1px solid black;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Photo Editor</h1>
+
+    <input type="file" id="imageUpload" accept="image/*" />
+
+    <canvas id="canvas"></canvas> <br />
+
+    Brightness:
+    <input type="range" id="brightness" min="0" max="200" value="100" /><br />
+    Saturation:
+    <input type="range" id="saturation" min="0" max="200" value="100" /><br />
+    Hue:
+    <input type="range" id="hue-rotate" min="0" max="360" value="0" /><br />
+
+    <script>
+      const imageUpload = document.getElementById('imageUpload');
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+      let img = null;
+
+      imageUpload.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+
+        reader.onload = (event) => {
+          img = new Image();
+          img.onload = () => {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+          };
+          img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+
+      // Example for Brightness adjustment:
+      const brightnessSlider = document.getElementById('brightness');
+      brightnessSlider.addEventListener('input', () => {
+        if (img) {
+          ctx.drawImage(img, 0, 0); // Redraw original image
+          ctx.filter = `brightness(${brightnessSlider.value}%)`; // Apply filter
+          ctx.drawImage(img, 0, 0); // Draw filtered image
+          ctx.filter = 'none'; // Reset filter to prevent accumulating effects
+        }
+      });
+
+      // Similar logic for Saturation and Hue
+
+      // Example of a filter (grayscale) could be implemented by setting
+      // ctx.filter = 'grayscale(100%)';  before ctx.drawImage().
+    </script>
+  </body>
+</html>
