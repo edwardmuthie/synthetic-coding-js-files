@@ -1,13 +1,55 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite App</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/main.js"></script>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML File List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin: 5px 0;
+        }
+        a {
+            text-decoration: none;
+            color: blue;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>HTML Files List</h1>
+    <ul id="file-list"></ul>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Folder where the HTML files are stored
+            const folderPath = 'synthetic-coding/';
+            // List of files - you might need to update this manually if server-side listing is not available
+            const files = [
+                'photo_editor.html',
+                // Add more file names here as needed
+            ];
+
+            const fileList = document.getElementById('file-list');
+
+            files.forEach(file => {
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.href = `${folderPath}${file}`;
+                a.textContent = file;
+                li.appendChild(a);
+                fileList.appendChild(li);
+            });
+        });
+    </script>
+</body>
 </html>
