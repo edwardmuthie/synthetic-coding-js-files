@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Expense Splitter</title>
+    <style>
+        #expense-form label, #expense-form input {
+    display: block;  /* Makes each label/input take full width */
+    margin-bottom: 5px; /* Adds space between items */
+}
+
+#expense-list, #summary {
+  margin-top: 20px;
+}
+
+    </style>
+</head>
+<body>
+    <h1>Expense Splitter</h1>
+
+    <div id="expense-form">
+        <label for="description">Description:</label><br>
+        <input type="text" id="description" name="description"><br>
+        <label for="amount">Amount:</label><br>
+        <input type="number" id="amount" name="amount"><br>
+        <label for="paidBy">Paid By:</label><br>
+        <input type="text" id="paidBy" name="paidBy"><br>
+        <label for="splitBetween">Split Between (comma-separated names):</label><br>
+        <input type="text" id="splitBetween" name="splitBetween"><br><br>
+        <button onclick="addExpense()">Add Expense</button>
+    </div>
+
+    <div id="expense-list">
+        <h2>Expenses</h2>
+        <ul id="expenses"></ul>
+    </div>
+    <div id="summary"></div>
+
+    <script>
+        const expenses = [];
+
+function addExpense() {
+    const description = document.getElementById("description").value;
+    const amount = parseFloat(document.getElementById("amount").value);
+    const paidBy = document.getElementById("paidBy").value;
+    const splitBetween = document.getElementById("splitBetween").value.split(",");
+
+    const expense = {
+        description,
+        amount,
+        paidBy,
+        splitBetween
+    };
+
+    expenses.push(expense);
+    displayExpenses();
+    calculateSummary();
+
+    // Clear the input fields:
+    document.getElementById("description").value = "";
+    document.getElementById("amount").value = "";
+    document.getElementById("paidBy").value = "";
+    document.getElementById("splitBetween").value = "";
+
+}
+
+
+
+function displayExpenses() {
+    const expensesList = document.getElementById("expenses");
+    expensesList.innerHTML = ""; //clear previous entries
+
+    expenses.forEach(expense => {
+        const listItem = document.createElement("li");
+        listItem.textContent = `${expense.description} - $${expense.amount.toFixed(2)} paid by ${expense.paidBy} (split between: ${expense.splitBetween.join(", ")})`;
+        expensesList.appendChild(listItem);
+    });
+
+}
+
+function calculateSummary() {
+
+    const balances = {};
+
+    expenses.forEach(expense => {
+        const numPeople = expense.splitBetween.length;
+        const splitAmount = expense.amount / numPeople;
+
+
+        balances[expense.paidBy] = (balances[expense.paidBy] || 0) + expense.amount;
+
+
+        expense.splitBetween.forEach(person => {
+
+            balances[person] = (balances[person] || 0) - splitAmount;
+
+        });
+    });
+
+
+
+    const summaryDiv = document.getElementById("summary");
+    summaryDiv.innerHTML = "<h2>Summary</h2>";  // Clear previous
+
+    for(const person in balances)
+    {
+        const balance = balances[person];
+        const formattedBalance = balance.toFixed(2);
+        summaryDiv.innerHTML += `<p>${person}: $${formattedBalance}</p>`;
+    }
+
+}
+
+
+
+
+    </script>
+
+</body>
+</html>
