@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Doodle Pad</title>
+<style>
+body {
+  margin: 0;
+  overflow: hidden; /* Prevent scrollbars */
+}
+#canvas {
+  border: 1px solid black;
+  cursor: crosshair;
+}
+#toolbar {
+    padding: 10px;
+    background-color: #f0f0f0;
+    text-align: center; /* Center the buttons */
+
+}
+
+</style>
+</head>
+<body>
+
+<div id="toolbar">
+    <button id="saveButton">Save</button>
+    <input type="color" id="colorPicker" value="#000000">
+    <input type="range" id="lineWidth" min="1" max="50" value="5">
+
+</div>
+
+<canvas id="canvas"></canvas>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const saveButton = document.getElementById('saveButton');
+const colorPicker = document.getElementById('colorPicker');
+const lineWidthRange = document.getElementById('lineWidth');
+
+
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight - document.getElementById('toolbar').offsetHeight;  // Subtract toolbar height
+
+
+let isDrawing = false;
+let lastX = 0;
+let lastY = 0;
+
+
+
+canvas.addEventListener('mousedown', (e) => {
+  isDrawing = true;
+  lastX = e.offsetX;
+  lastY = e.offsetY;
+});
+
+canvas.addEventListener('mousemove', draw);
+
+canvas.addEventListener('mouseup', () => isDrawing = false);
+canvas.addEventListener('mouseout', () => isDrawing = false);
+
+
+colorPicker.addEventListener('change', () => {
+    ctx.strokeStyle = colorPicker.value;
+});
+
+
+lineWidthRange.addEventListener('input', () => {
+    ctx.lineWidth = lineWidthRange.value;
+});
+
+
+saveButton.addEventListener('click', () => {
+    const link = document.createElement('a');
+    link.download = 'my-doodle.png';
+    link.href = canvas.toDataURL(); // Convert canvas content to data URL
+    link.click(); // Simulate click to trigger download
+});
+
+function draw(e) {
+  if (!isDrawing) return;
+
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(e.offsetX, e.offsetY);
+    ctx.strokeStyle = colorPicker.value; // Use selected color
+    ctx.lineWidth = lineWidthRange.value;  // Use selected line width
+    ctx.lineCap = "round"; // For smoother lines
+    ctx.stroke();
+
+    lastX = e.offsetX;
+    lastY = e.offsetY;
+}
+
+
+
+</script>
+
+</body>
+</html>
