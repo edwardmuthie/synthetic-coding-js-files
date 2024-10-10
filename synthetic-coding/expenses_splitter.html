@@ -2,6 +2,8 @@
 <html>
 <head>
     <title>Expense Splitter</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jasmine-core/lib/jasmine-core/jasmine.css">
+
     <style>
         #expense-form label, #expense-form input {
     display: block;  /* Makes each label/input take full width */
@@ -35,6 +37,10 @@
     </div>
     <div id="summary"></div>
 
+    <script src="https://cdn.jsdelivr.net/npm/jasmine-core/lib/jasmine-core/jasmine.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jasmine-core/lib/jasmine-core/jasmine-html.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jasmine-core/lib/jasmine-core/boot0.js"></script>    
+    
     <script>
         const expenses = [];
 
@@ -110,10 +116,183 @@ function calculateSummary() {
 
 }
 
+    </script>
+    <script>
+describe("Expense Splitter App", function() {
 
+// Requirement 1: Test for Creating a Group
+it("should open a modal or form to enter the group name and members when the createGroup button is clicked", function() {
+    const createGroupButton = document.getElementById("createGroup");
+    spyOn(createGroupButton, 'click');
+    createGroupButton.click();
+    expect(createGroupButton.click).toHaveBeenCalled();
+});
+
+it("should add a person to the group when the addPerson button is clicked", function() {
+    const addPersonButton = document.getElementById("addPerson");
+    const personInput = document.getElementById("person");
+    personInput.value = "John Doe";
+    spyOn(window, 'addPersonToGroup');
+    addPersonButton.click();
+    expect(window.addPersonToGroup).toHaveBeenCalledWith("John Doe");
+});
+
+it("should save the group when the saveGroup button is clicked", function() {
+    const saveGroupButton = document.getElementById("saveGroup");
+    spyOn(window, 'saveGroup');
+    saveGroupButton.click();
+    expect(window.saveGroup).toHaveBeenCalled();
+});
+
+// Requirement 2: Test for Logging Expenses
+it("should log an expense when all necessary fields are filled and the button is clicked", function() {
+    const descriptionInput = document.getElementById("description");
+    const amountInput = document.getElementById("amount");
+    const paidByInput = document.getElementById("paidBy");
+    const splitBetweenInput = document.getElementById("splitBetween");
+    const addButton = document.querySelector("#expense-form button");
+
+    // Set values for the inputs
+    descriptionInput.value = "Lunch";
+    amountInput.value = 150;
+    paidByInput.value = "Alice";
+    splitBetweenInput.value = "Alice, Bob";
+
+    // Spy on the addExpense function
+    spyOn(window, 'addExpense');
+
+    // Simulate button click
+    addButton.click();
+
+    // Expect addExpense to have been called
+    expect(window.addExpense).toHaveBeenCalled();
+});
+
+// Requirement 3: Test for Viewing Logged Expenses
+it("should display all logged expenses in the expenses list", function() {
+    const expensesList = document.getElementById("expenses");
+    expect(expensesList).not.toBeNull();
+    expect(expensesList.children.length).toBeGreaterThan(0);
+    Array.from(expensesList.children).forEach(expense => {
+        expect(expense.querySelector(".amount")).not.toBeNull();
+        expect(expense.querySelector(".payer")).not.toBeNull();
+        expect(expense.querySelector(".participants")).not.toBeNull();
+    });
+});
+
+// Requirement 4: Test for Calculating Participant's Share
+it("should calculate each participant's share of the total expenses", function() {
+    spyOn(window, 'calculateShares');
+    window.calculateShares();
+    expect(window.calculateShares).toHaveBeenCalled();
+});
+
+// Requirement 5: Test for Splitting Expenses Equally or Unequally
+it("should toggle between equal and custom splits in the expense form", function() {
+    const equalSplitToggle = document.getElementById("equalSplitToggle");
+    const customSplitFields = document.querySelectorAll(".customSplit");
+    equalSplitToggle.click();
+    customSplitFields.forEach(field => {
+        expect(field.style.display).not.toBe("none");
+    });
+});
+
+// Requirement 6: Test for Showing Owed Amounts
+it("should display a summary of who owes whom in the summary section", function() {
+    const summarySection = document.getElementById("summary");
+    expect(summarySection).not.toBeNull();
+    expect(summarySection.children.length).toBeGreaterThan(0);
+    Array.from(summarySection.children).forEach(entry => {
+        expect(entry.textContent).toMatch(/owes/);
+    });
+});
+
+// Requirement 7: Test for Marking Expenses as Settled
+it("should mark an expense as settled when the settle button is clicked", function() {
+    const settleButton = document.querySelector("#settle");
+    spyOn(window, 'settleExpense');
+    settleButton.click();
+    expect(window.settleExpense).toHaveBeenCalled();
+});
+
+// Requirement 8: Test for Renaming or Deleting a Group
+it("should rename a group when the renameGroup button is clicked", function() {
+    const renameGroupButton = document.getElementById("renameGroup");
+    spyOn(window, 'renameGroup');
+    renameGroupButton.click();
+    expect(window.renameGroup).toHaveBeenCalled();
+});
+
+it("should delete a group when the deleteGroup button is clicked", function() {
+    const deleteGroupButton = document.getElementById("deleteGroup");
+    spyOn(window, 'deleteGroup');
+    deleteGroupButton.click();
+    expect(window.deleteGroup).toHaveBeenCalled();
+});
+
+// Requirement 9: Test for Editing or Deleting an Expense
+it("should edit an expense when the edit button is clicked", function() {
+    const editButton = document.querySelector(".edit");
+    spyOn(window, 'editExpense');
+    editButton.click();
+    expect(window.editExpense).toHaveBeenCalled();
+});
+
+it("should delete an expense when the delete button is clicked", function() {
+    const deleteButton = document.querySelector(".delete");
+    spyOn(window, 'deleteExpense');
+    deleteButton.click();
+    expect(window.deleteExpense).toHaveBeenCalled();
+});
+
+// Requirement 10: Test for Filtering Expenses
+it("should filter expenses when a filter option is selected", function() {
+    const filterDropdown = document.getElementById("filterPerson");
+    filterDropdown.value = "Alice";
+    spyOn(window, 'filterExpenses');
+    filterDropdown.dispatchEvent(new Event('change'));
+    expect(window.filterExpenses).toHaveBeenCalledWith("Alice");
+});
+
+// Requirement 11: Test for Saving and Loading Expense Data
+it("should save expense data to local storage and load it when the app is reopened", function() {
+    spyOn(localStorage, 'setItem');
+    spyOn(localStorage, 'getItem');
+    window.saveExpenses();
+    expect(localStorage.setItem).toHaveBeenCalled();
+    window.loadExpenses();
+    expect(localStorage.getItem).toHaveBeenCalled();
+});
+
+// Requirement 12: Test for Exporting Expense Summary
+it("should export the expense summary as a file when the export button is clicked", function() {
+    const exportButton = document.getElementById("export");
+    spyOn(window, 'exportSummary');
+    exportButton.click();
+    expect(window.exportSummary).toHaveBeenCalled();
+});
+
+// Requirement 13: Test for Displaying Notifications
+it("should display a notification when an action is performed", function() {
+    spyOn(window, 'showNotification');
+    window.addExpense();
+    expect(window.showNotification).toHaveBeenCalled();
+});
+
+// Requirement 14: Test for Setting Recurring Expenses
+it("should allow setting an expense as recurring when the recurringExpense checkbox is checked", function() {
+    const recurringCheckbox = document.getElementById("recurringExpense");
+    recurringCheckbox.checked = true;
+    spyOn(window, 'setRecurringExpense');
+    recurringCheckbox.dispatchEvent(new Event('change'));
+    expect(window.setRecurringExpense).toHaveBeenCalledWith(true);
+});
+
+});
 
 
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/jasmine-core/lib/jasmine-core/boot1.js"></script>
 
 </body>
 </html>
