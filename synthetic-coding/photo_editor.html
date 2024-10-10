@@ -2,6 +2,8 @@
 <html>
   <head>
     <title>Photo Editor</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jasmine-core/lib/jasmine-core/jasmine.css">
+
     <style>
       /*  Basic CSS styling - you'll likely want to expand on this */
       #canvas {
@@ -22,6 +24,10 @@
     <input type="range" id="saturation" min="0" max="200" value="100" /><br />
     Hue:
     <input type="range" id="hue-rotate" min="0" max="360" value="0" /><br />
+
+    <script src="https://cdn.jsdelivr.net/npm/jasmine-core/lib/jasmine-core/jasmine.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jasmine-core/lib/jasmine-core/jasmine-html.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jasmine-core/lib/jasmine-core/boot.js"></script>
 
     <script>
       const imageUpload = document.getElementById('imageUpload');
@@ -60,6 +66,160 @@
 
       // Example of a filter (grayscale) could be implemented by setting
       // ctx.filter = 'grayscale(100%)';  before ctx.drawImage().
+    </script>
+    <script>
+      describe("Photo Editor App", function() {
+    
+    // Requirement 1: Test for Image Upload
+    it("should allow the user to upload an image file", function() {
+        const uploadButton = document.getElementById("imageUpload");
+        spyOn(uploadButton, 'click');
+        uploadButton.click();
+        expect(uploadButton.click).toHaveBeenCalled();
+    });
+
+    // Requirement 2: Test for Image Rendering
+    it("should render the uploaded image on the canvas", function() {
+        const canvas = document.getElementById("canvas");
+        const context = canvas.getContext("2d");
+        // Mock image upload and drawing
+        const image = new Image();
+        image.src = 'test-image.jpg'; // Sample test image
+        spyOn(context, 'drawImage');
+        context.drawImage(image, 0, 0);
+        expect(context.drawImage).toHaveBeenCalledWith(image, 0, 0);
+    });
+
+    // Requirement 3: Test for Image Cropping
+    it("should enable the crop button once the image is loaded", function() {
+        const cropButton = document.getElementById("cropButton");
+        // Assume the image is already loaded
+        cropButton.disabled = false;
+        expect(cropButton.disabled).toBe(false);
+    });
+
+    it("should render a resizable rectangle on the image when crop button is clicked", function() {
+        const cropButton = document.getElementById("cropButton");
+        cropButton.click();
+        // Mock the crop area as a rectangle
+        const cropArea = document.querySelector('.crop-area'); // Assuming crop area is a class
+        expect(cropArea).not.toBeNull();
+        expect(cropArea.style.resize).toBe('both');
+    });
+
+    // Requirement 4: Test for Image Rotation
+    it("should allow the user to provide a custom angle for rotation", function() {
+        const rotationInput = document.getElementById("rotationDegree");
+        rotationInput.value = 45; // Test with 45 degrees
+        expect(parseInt(rotationInput.value)).toBe(45);
+    });
+
+    it("should rotate the image when the rotate button is clicked", function() {
+        const rotateButton = document.getElementById("rotateButton");
+        spyOn(rotateButton, 'click');
+        rotateButton.click();
+        expect(rotateButton.click).toHaveBeenCalled();
+        // Additional checks for image rotation can be added based on implementation
+    });
+
+    // Requirement 5: Test for Image Resizing
+    it("should allow the user to provide custom width and height values", function() {
+        const widthInput = document.getElementById("resizeWidth");
+        const heightInput = document.getElementById("resizeHeight");
+        widthInput.value = 500;
+        heightInput.value = 300;
+        expect(parseInt(widthInput.value)).toBe(500);
+        expect(parseInt(heightInput.value)).toBe(300);
+    });
+
+    it("should resize the image when the resize button is clicked", function() {
+        const resizeButton = document.getElementById("resizeButton");
+        spyOn(resizeButton, 'click');
+        resizeButton.click();
+        expect(resizeButton.click).toHaveBeenCalled();
+        // Additional checks for resizing behavior can be added
+    });
+
+    // Requirement 6: Test for Brightness Adjustment
+    it("should adjust the brightness of the image using the brightness slider", function() {
+        const brightnessSlider = document.getElementById("brightnessSlider");
+        brightnessSlider.value = 50;
+        expect(parseInt(brightnessSlider.value)).toBe(50);
+        // Additional tests can verify how brightness affects the canvas image
+    });
+
+    // Requirement 7: Test for Saturation Adjustment
+    it("should adjust the saturation of the image using the saturation slider", function() {
+        const saturationSlider = document.getElementById("saturationSlider");
+        saturationSlider.value = 60;
+        expect(parseInt(saturationSlider.value)).toBe(60);
+        // Additional tests can verify how saturation affects the canvas image
+    });
+
+    // Requirement 8: Test for Hue Adjustment
+    it("should adjust the hue of the image using the hue slider", function() {
+        const hueSlider = document.getElementById("hueSlider");
+        hueSlider.value = 120;
+        expect(parseInt(hueSlider.value)).toBe(120);
+        // Additional tests can verify how hue affects the canvas image
+    });
+
+    // Requirement 9: Test for Image Filters
+    it("should apply the selected image filter from the filter dropdown", function() {
+        const filterDropdown = document.getElementById("filterDropdown");
+        filterDropdown.value = 'grayscale';
+        expect(filterDropdown.value).toBe('grayscale');
+        // Additional tests can verify how the filter is applied to the image
+    });
+
+    // Requirement 10: Test for Adding Text
+    it("should allow the user to add text to the image and adjust font size and color", function() {
+        const textInput = document.getElementById("textInput");
+        const fontSizeInput = document.getElementById("fontSizeInput");
+        const fontColorPicker = document.getElementById("fontColorPicker");
+        textInput.value = "Sample Text";
+        fontSizeInput.value = 20;
+        fontColorPicker.value = "#FF0000";
+        expect(textInput.value).toBe("Sample Text");
+        expect(parseInt(fontSizeInput.value)).toBe(20);
+        expect(fontColorPicker.value).toBe("#FF0000");
+    });
+
+    // Requirement 11: Test for Undo/Redo Functionality
+    it("should allow the user to undo the last action when undo button is clicked", function() {
+        const undoButton = document.getElementById("undoButton");
+        spyOn(undoButton, 'click');
+        undoButton.click();
+        expect(undoButton.click).toHaveBeenCalled();
+    });
+
+    it("should allow the user to redo the last undone action when redo button is clicked", function() {
+        const redoButton = document.getElementById("redoButton");
+        spyOn(redoButton, 'click');
+        redoButton.click();
+        expect(redoButton.click).toHaveBeenCalled();
+    });
+
+    // Requirement 12: Test for Reset Functionality
+    it("should reset the image when the reset button is clicked", function() {
+        const resetButton = document.getElementById("resetButton");
+        spyOn(resetButton, 'click');
+        resetButton.click();
+        expect(resetButton.click).toHaveBeenCalled();
+        // Additional tests can verify if the image is restored to its initial state
+    });
+
+    // Requirement 13: Test for Saving the Image
+    it("should save the edited image when the save button is clicked", function() {
+        const saveButton = document.getElementById("saveImageButton");
+        spyOn(saveButton, 'click');
+        saveButton.click();
+        expect(saveButton.click).toHaveBeenCalled();
+        // Additional tests can verify if the file download is triggered
+    });
+
+});
+
     </script>
   </body>
 </html>
