@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Virtual Piano</title>
+<style>
+body { margin: 0; padding: 0; }
+.piano { display: flex; }
+.key { height: 150px; background-color: white; border: 1px solid black; flex: 1; cursor: pointer; }
+.key.black { width: 40px; background-color: black; position: relative; left: -20px; z-index: 1; margin-left: -20px; margin-right: -20px;}
+#recording { margin-top: 20px; }
+</style>
+</head>
+<body>
+
+<div class="piano"></div>
+<button id="record">Record</button>
+<button id="stop">Stop</button>
+<button id="play">Play</button>
+<div id="recording"></div>
+
+<script>
+const piano = document.querySelector('.piano');
+const keys = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+const recordButton = document.getElementById('record');
+const stopButton = document.getElementById('stop');
+const playButton = document.getElementById('play');
+const recordingDiv = document.getElementById('recording');
+
+let recording = [];
+let recordingStartTime = 0;
+
+// Create piano keys
+for (let octave = 0; octave < 2; octave++) {
+    keys.forEach(key => {
+        const keyDiv = document.createElement('div');
+        keyDiv.classList.add('key');
+        const isBlackKey = key.includes('#');
+        if (isBlackKey) {
+            keyDiv.classList.add('black');
+        }
+        keyDiv.dataset.note = key + octave;
+
+        keyDiv.addEventListener('mousedown', () => {
+            playNote(key + octave);
+            if (isRecording) {
+                recordNote(key + octave);
+            }
+        });
+
+        keyDiv.addEventListener('mouseup', () => {
+            stopNote(key + octave);
+        });
+
+        piano.appendChild(keyDiv);
+    });
+}
+
+
+function playNote(note) {
+    const audio = new Audio(`https://awiclass.monoame.com/pianosound/${note}.mp3`); // Example using external sound files
+    audio.play();
+
+}
+
+function stopNote(note) {
+  //  No implementation for stopping individual notes in this basic example, since short mp3 files are used.
+  //  For sustained sounds, this would handle stopping the note.
+}
+
+
+let isRecording = false;
+
+recordButton.addEventListener('click', () => {
+    isRecording = true;
+    recording = [];
+    recordingStartTime = Date.now();
+    recordingDiv.textContent = "Recording...";
+});
+
+stopButton.addEventListener('click', () => {
+    isRecording = false;
+    recordingDiv.textContent = "Recording stopped.";
+});
+
+
+function recordNote(note) {
+  const time = Date.now() - recordingStartTime;
+  recording.push({ note, time });
+}
+
+
+playButton.addEventListener('click', () => {
+    recording.forEach(({ note, time }) => {
+        setTimeout(() => {
+            playNote(note);
+        }, time);
+    });
+});
+
+
+
+</script>
+
+</body>
+</html>
