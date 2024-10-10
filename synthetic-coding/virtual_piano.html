@@ -2,6 +2,8 @@
 <html>
 <head>
 <title>Virtual Piano</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jasmine-core/lib/jasmine-core/jasmine.css">
+
 <style>
 body { margin: 0; padding: 0; }
 .piano { display: flex; }
@@ -17,6 +19,10 @@ body { margin: 0; padding: 0; }
 <button id="stop">Stop</button>
 <button id="play">Play</button>
 <div id="recording"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/jasmine-core/lib/jasmine-core/jasmine.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jasmine-core/lib/jasmine-core/jasmine-html.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jasmine-core/lib/jasmine-core/boot0.js"></script>
 
 <script>
 const piano = document.querySelector('.piano');
@@ -97,9 +103,116 @@ playButton.addEventListener('click', () => {
     });
 });
 
+</script>
 
+<script>
+    describe("Virtual Piano Application", function() {
+
+// Requirement 1: Test for Visual Representation of Piano Keys
+it("should have a visual representation with keys as div elements inside the piano container", function() {
+    const piano = document.querySelector(".piano");
+    expect(piano).not.toBeNull();
+    expect(piano.children.length).toBeGreaterThan(0);
+    Array.from(piano.children).forEach(key => {
+        expect(key.tagName).toBe("DIV");
+        expect(key.classList.contains("key")).toBeTrue();
+    });
+});
+
+
+// Requirement 2: Test for Playing Sound on Key Click
+it("should play sound when a key is clicked", function() {
+    const pianoKey = document.querySelector(".key");
+    spyOn(window, 'playSound');
+    pianoKey.click();
+    expect(window.playSound).toHaveBeenCalled();
+});
+
+// Requirement 3: Test for Playing Sound Using Keyboard
+it("should play sound when a mapped keyboard key is pressed", function() {
+    const event = new KeyboardEvent('keydown', { key: 'a' });
+    spyOn(window, 'playSound');
+    document.dispatchEvent(event);
+    expect(window.playSound).toHaveBeenCalled();
+});
+
+// Requirement 4: Test for Highlighting Keys When Played
+it("should highlight a key when it is clicked or when the corresponding keyboard key is pressed", function() {
+    const pianoKey = document.querySelector(".key");
+    pianoKey.click();
+    expect(pianoKey.classList.contains("active")).toBeTrue();
+});
+
+// Requirement 5: Test for Starting Recording
+it("should start recording when the record button is clicked", function() {
+    const recordButton = document.getElementById("record");
+    spyOn(window, 'startRecording');
+    recordButton.click();
+    expect(window.startRecording).toHaveBeenCalled();
+});
+
+// Requirement 6: Test for Stopping Recording
+it("should stop recording when the stop button is clicked", function() {
+    const stopButton = document.getElementById("stop");
+    spyOn(window, 'stopRecording');
+    stopButton.click();
+    expect(window.stopRecording).toHaveBeenCalled();
+});
+
+// Requirement 7: Test for Playback of Recorded Performance
+it("should play back the recorded sequence when the play button is clicked", function() {
+    const playButton = document.getElementById("play");
+    spyOn(window, 'playRecording');
+    playButton.click();
+    expect(window.playRecording).toHaveBeenCalled();
+});
+
+// Requirement 8: Test for Visual Indicator During Playback
+it("should highlight the key during playback to indicate it is being played", function() {
+    const pianoKey = document.querySelector(".key");
+    spyOn(pianoKey.classList, 'add');
+    window.playRecording();
+    expect(pianoKey.classList.add).toHaveBeenCalledWith("active");
+});
+
+// Requirement 9: Test for Clearing the Recorded Sequence
+it("should clear the recorded sequence when the clear button is clicked", function() {
+    const clearButton = document.getElementById("clear");
+    spyOn(window, 'clearRecording');
+    clearButton.click();
+    expect(window.clearRecording).toHaveBeenCalled();
+});
+
+// Requirement 10: Test for Changing Piano Sound
+it("should change the piano sound when a different option is selected from the dropdown", function() {
+    const soundSelector = document.getElementById("sound");
+    spyOn(window, 'changeSound');
+    soundSelector.value = 'electric';
+    soundSelector.dispatchEvent(new Event('change'));
+    expect(window.changeSound).toHaveBeenCalledWith('electric');
+});
+
+// Requirement 11: Test for Displaying Notes
+it("should display the note being played in the display area", function() {
+    const pianoKey = document.querySelector(".key");
+    const notesDisplay = document.getElementById("notes");
+    pianoKey.click();
+    expect(notesDisplay.textContent).not.toBe("");
+    expect(notesDisplay.textContent).toMatch(/[A-G]#?\d/);
+});
+
+// Requirement 12: Test for Saving the Recorded Performance
+it("should save the recorded performance when the save button is clicked", function() {
+    const saveButton = document.getElementById("save");
+    spyOn(window, 'saveRecording');
+    saveButton.click();
+    expect(window.saveRecording).toHaveBeenCalled();
+});
+});
 
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/jasmine-core/lib/jasmine-core/boot1.js"></script>
 
 </body>
 </html>
