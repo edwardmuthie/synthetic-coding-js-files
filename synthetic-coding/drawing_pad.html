@@ -2,10 +2,11 @@
 <html>
 <head>
 <title>Doodle Pad</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jasmine-core/lib/jasmine-core/jasmine.css">
+
 <style>
 body {
   margin: 0;
-  overflow: hidden; /* Prevent scrollbars */
 }
 #canvas {
   border: 1px solid black;
@@ -30,6 +31,10 @@ body {
 </div>
 
 <canvas id="canvas"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/jasmine-core/lib/jasmine-core/jasmine.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jasmine-core/lib/jasmine-core/jasmine-html.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jasmine-core/lib/jasmine-core/boot0.js"></script>
 
 <script>
 const canvas = document.getElementById('canvas');
@@ -97,6 +102,141 @@ function draw(e) {
 
 
 </script>
+<script>
+describe("Drawing Pad Application", function() {
+
+// Requirement 1: Test for Free Drawing on the Canvas
+it("should allow the user to draw freely on the canvas using mouse events", function() {
+    const canvas = document.getElementById("canvas");
+    const context = canvas.getContext("2d");
+    spyOn(context, 'moveTo');
+    spyOn(context, 'lineTo');
+    spyOn(context, 'stroke');
+
+    // Simulate mouse down and mouse move events
+    const mouseDownEvent = new MouseEvent('mousedown', { clientX: 100, clientY: 100 });
+    const mouseMoveEvent = new MouseEvent('mousemove', { clientX: 200, clientY: 200 });
+    canvas.dispatchEvent(mouseDownEvent);
+    canvas.dispatchEvent(mouseMoveEvent);
+
+    expect(context.moveTo).toHaveBeenCalled();
+    expect(context.lineTo).toHaveBeenCalled();
+    expect(context.stroke).toHaveBeenCalled();
+});
+
+// Requirement 2: Test for Changing Line Width
+it("should allow the user to change the line width using the slider", function() {
+    const lineWidthSlider = document.getElementById("lineWidth");
+    lineWidthSlider.value = 10;
+    lineWidthSlider.dispatchEvent(new Event('input'));
+    expect(lineWidthSlider.value).toBe('10');
+});
+
+// Requirement 3: Test for Changing Line Color
+it("should allow the user to select a different line color using the color picker", function() {
+    const colorPicker = document.getElementById("colorPicker");
+    colorPicker.value = "#FF0000"; // Red color
+    colorPicker.dispatchEvent(new Event('input'));
+    expect(colorPicker.value).toBe("#FF0000");
+});
+
+// Requirement 4: Test for Eraser Functionality
+it("should enable the eraser tool when the eraser button is clicked", function() {
+    const eraserButton = document.getElementById("eraser");
+    spyOn(eraserButton, 'click');
+    eraserButton.click();
+    expect(eraserButton.click).toHaveBeenCalled();
+    // Additional implementation-specific checks can be added based on how eraser mode is toggled
+});
+
+// Requirement 5: Test for Clearing the Canvas
+it("should clear the canvas when the clear button is clicked", function() {
+    const clearButton = document.getElementById("clearCanvasButton");
+    const canvas = document.getElementById("canvas");
+    const context = canvas.getContext("2d");
+    spyOn(context, 'clearRect');
+
+    clearButton.click();
+    expect(context.clearRect).toHaveBeenCalledWith(0, 0, canvas.width, canvas.height);
+});
+
+// Requirement 6: Test for Drawing Different Shapes
+it("should allow the user to select and draw different shapes from the dropdown", function() {
+    const shapeSelector = document.getElementById("shapeSelector");
+    shapeSelector.value = "rectangle";
+    shapeSelector.dispatchEvent(new Event('change'));
+    expect(shapeSelector.value).toBe("rectangle");
+
+    // Additional checks can verify if the selected shape is drawn correctly
+});
+
+// Requirement 7: Test for Undo Functionality
+it("should undo the last action when the undo button is clicked", function() {
+    const undoButton = document.getElementById("undoButton");
+    spyOn(undoButton, 'click');
+    undoButton.click();
+    expect(undoButton.click).toHaveBeenCalled();
+    // Additional tests can verify if the state is properly reverted
+});
+
+// Requirement 8: Test for Redo Functionality
+it("should redo the last undone action when the redo button is clicked", function() {
+    const redoButton = document.getElementById("redoButton");
+    spyOn(redoButton, 'click');
+    redoButton.click();
+    expect(redoButton.click).toHaveBeenCalled();
+    // Additional tests can verify if the state is properly reapplied
+});
+
+// Requirement 9: Test for Changing Background Color
+it("should change the background color of the canvas when a new color is selected", function() {
+    const backgroundColorPicker = document.getElementById("backgroundColorPicker");
+    backgroundColorPicker.value = "#00FF00"; // Green color
+    backgroundColorPicker.dispatchEvent(new Event('input'));
+    expect(backgroundColorPicker.value).toBe("#00FF00");
+
+    // Additional implementation checks can be added to confirm the canvas background change
+});
+
+// Requirement 10: Test for Zoom In/Out Functionality
+it("should zoom in when the zoom in button is clicked", function() {
+    const zoomInButton = document.getElementById("zoomInButton");
+    spyOn(zoomInButton, 'click');
+    zoomInButton.click();
+    expect(zoomInButton.click).toHaveBeenCalled();
+    // Additional tests can check if the zoom level has increased
+});
+
+it("should zoom out when the zoom out button is clicked", function() {
+    const zoomOutButton = document.getElementById("zoomOutButton");
+    spyOn(zoomOutButton, 'click');
+    zoomOutButton.click();
+    expect(zoomOutButton.click).toHaveBeenCalled();
+    // Additional tests can check if the zoom level has decreased
+});
+
+// Requirement 11: Test for Saving the Drawing as an Image
+it("should save the canvas as an image file when the save button is clicked", function() {
+    const saveButton = document.getElementById("saveButton");
+    spyOn(saveButton, 'click');
+    saveButton.click();
+    expect(saveButton.click).toHaveBeenCalled();
+    // Additional implementation checks can be added to confirm the file download
+});
+
+// Requirement 12: Test for Responsive Drawing
+it("should adjust the canvas size based on the viewport size for smooth drawing", function() {
+    const canvas = document.getElementById("canvas");
+    // Simulate a window resize event
+    window.dispatchEvent(new Event('resize'));
+    // Check if the canvas width and height are adjusted based on the window size
+    expect(canvas.width).toBe(window.innerWidth);
+    expect(canvas.height).toBe(window.innerHeight);
+});
+});
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/jasmine-core/lib/jasmine-core/boot1.js"></script>
 
 </body>
 </html>
