@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Drum Kit</title>
+    <style>
+        body {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f0f0;
+            font-family: sans-serif;
+        }
+
+        .drum {
+            margin: 10px;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: transform 0.1s ease;
+            user-select: none; /* Prevent text selection */
+        }
+
+        .drum:active {
+            transform: scale(0.95);
+        }
+
+        .playing {
+            transform: scale(0.9);
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.4); /* Enhanced shadow when playing */
+
+        }
+
+        .key {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .sound {
+            display: none; /* Hide the audio elements visually */
+        }
+    </style>
+</head>
+<body>
+
+
+    <div data-key="65" class="drum">
+        <div class="key">A</div>
+        <audio data-key="65" class="sound" src="sounds/clap.wav"></audio> </div>
+    <div data-key="83" class="drum">
+        <div class="key">S</div>
+        <audio data-key="83" class="sound" src="sounds/hihat.wav"></audio>
+    </div>
+    <div data-key="68" class="drum">
+        <div class="key">D</div>
+        <audio data-key="68" class="sound" src="sounds/kick.wav"></audio>
+    </div>
+    <div data-key="70" class="drum">
+        <div class="key">F</div>
+        <audio data-key="70" class="sound" src="sounds/openhat.wav"></audio>
+    </div>
+    <div data-key="71" class="drum">
+        <div class="key">G</div>
+        <audio data-key="71" class="sound" src="sounds/boom.wav"></audio>
+    </div>
+    <div data-key="72" class="drum">
+        <div class="key">H</div>
+        <audio data-key="72" class="sound" src="sounds/ride.wav"></audio>
+    </div>
+    <div data-key="74" class="drum">
+        <div class="key">J</div>
+        <audio data-key="74" class="sound" src="sounds/snare.wav"></audio>
+    </div>
+    <div data-key="75" class="drum">
+        <div class="key">K</div>
+        <audio data-key="75" class="sound" src="sounds/tom.wav"></audio>
+    </div>
+    <div data-key="76" class="drum">
+        <div class="key">L</div>
+        <audio data-key="76" class="sound" src="sounds/tink.wav"></audio>
+    </div>
+
+
+<script>
+
+    window.addEventListener('keydown', function(e){
+       const audio = document.querySelector(`audio[data-key="${e.keyCode}"]`);
+       const key = document.querySelector(`.drum[data-key="${e.keyCode}"]`);
+       if(!audio) return; // stop function from running altogether
+       audio.currentTime = 0; // rewind to start
+       audio.play();
+       key.classList.add('playing');
+
+    });
+
+
+    function removeTransition(e){
+        if(e.propertyName !== 'transform') return; // skip it if it's not a transform
+        this.classList.remove('playing');
+      }
+
+      const keys = document.querySelectorAll('.drum');
+      keys.forEach(key => key.addEventListener('transitionend',removeTransition));
+
+
+
+
+</script>
+
+</body>
+</html>
