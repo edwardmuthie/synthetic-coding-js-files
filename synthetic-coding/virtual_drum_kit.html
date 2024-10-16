@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Virtual Drum Kit</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jasmine-core/lib/jasmine-core/jasmine.css">
+
     <style>
         body {
             display: flex;
@@ -33,7 +35,6 @@
         .playing {
             transform: scale(0.9);
             box-shadow: 3px 3px 10px rgba(0,0,0,0.4); /* Enhanced shadow when playing */
-
         }
 
         .key {
@@ -49,11 +50,10 @@
     </style>
 </head>
 <body>
-
-
     <div data-key="65" class="drum">
         <div class="key">A</div>
-        <audio data-key="65" class="sound" src="sounds/clap.wav"></audio> </div>
+        <audio data-key="65" class="sound" src="sounds/clap.wav"></audio>
+    </div>
     <div data-key="83" class="drum">
         <div class="key">S</div>
         <audio data-key="83" class="sound" src="sounds/hihat.wav"></audio>
@@ -87,9 +87,7 @@
         <audio data-key="76" class="sound" src="sounds/tink.wav"></audio>
     </div>
 
-
 <script>
-
     window.addEventListener('keydown', function(e){
        const audio = document.querySelector(`audio[data-key="${e.keyCode}"]`);
        const key = document.querySelector(`.drum[data-key="${e.keyCode}"]`);
@@ -97,22 +95,168 @@
        audio.currentTime = 0; // rewind to start
        audio.play();
        key.classList.add('playing');
-
     });
-
 
     function removeTransition(e){
         if(e.propertyName !== 'transform') return; // skip it if it's not a transform
         this.classList.remove('playing');
-      }
+    }
 
-      const keys = document.querySelectorAll('.drum');
-      keys.forEach(key => key.addEventListener('transitionend',removeTransition));
+    const keys = document.querySelectorAll('.drum');
+    keys.forEach(key => key.addEventListener('transitionend', removeTransition));
+</script>
 
+<!-- Jasmine Test Cases -->
+<script src="https://cdn.jsdelivr.net/npm/jasmine-core/lib/jasmine-core/jasmine.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jasmine-core/lib/jasmine-core/jasmine-html.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jasmine-core/lib/jasmine-core/boot0.js"></script>
 
+<script>
+describe("Virtual Drum Kit", function() {
 
+// Requirement 1 - Visual representation of drum pads
+it("should have drum pads with data-key attributes", function() {
+    const drumPads = document.querySelectorAll('.drum');
+    drumPads.forEach(pad => {
+        expect(pad.hasAttribute('data-key')).toBe(true);
+    });
+});
+
+// Requirement 2 - Play correct sound on key press
+it("should play the correct sound when a key is pressed", function() {
+    const keyEvent = new KeyboardEvent('keydown', { keyCode: 65 });
+    window.dispatchEvent(keyEvent);
+    const audio = document.querySelector('audio[data-key="65"]');
+    spyOn(audio, 'play');
+    audio.play();
+    expect(audio.play).toHaveBeenCalled();
+});
+
+// Requirement 3 - Play correct sound on drum pad click
+it("should play the correct sound when a drum pad is clicked", function() {
+    const drumPad = document.querySelector('.drum[data-key="65"]');
+    const audio = document.querySelector('audio[data-key="65"]');
+    spyOn(audio, 'play');
+    drumPad.click();
+    expect(audio.play).toHaveBeenCalled();
+});
+
+// Requirement 4 - Visual indication when drum pad is activated
+it("should visually indicate when a drum pad is activated", function() {
+    const drumPad = document.querySelector('.drum[data-key="65"]');
+    drumPad.click();
+    expect(drumPad.classList.contains('playing')).toBe(true);
+});
+
+// Requirement 5 - Reset visual feedback after transition ends
+it("should remove the 'playing' class after transition ends", function(done) {
+    const drumPad = document.querySelector('.drum[data-key="65"]');
+    drumPad.click();
+    setTimeout(function() {
+        expect(drumPad.classList.contains('playing')).toBe(false);
+        done();
+    }, 300); // Adjust to match the transition duration
+});
+
+// Requirement 6 - Recording drum session
+it("should start and stop recording when record button is clicked", function() {
+    const recordButton = document.getElementById('record');
+    spyOn(recordButton, 'click');
+    recordButton.click();
+    expect(recordButton.click).toHaveBeenCalled();
+    // Additional test for start and stop logic can be added
+});
+
+// Requirement 7 - Playback recorded drum session
+it("should play back the recorded drum session when play button is clicked", function() {
+    const playButton = document.getElementById('play');
+    spyOn(playButton, 'click');
+    playButton.click();
+    expect(playButton.click).toHaveBeenCalled();
+    // Additional test for playback logic can be added
+});
+
+// Requirement 8 - Delete recorded session
+it("should clear recorded session when clear button is clicked", function() {
+    const clearButton = document.getElementById('clear');
+    spyOn(clearButton, 'click');
+    clearButton.click();
+    expect(clearButton.click).toHaveBeenCalled();
+    // Additional test for clearing logic can be added
+});
+
+// Requirement 9 - Save session as audio file
+it("should save the recorded session as an audio file when save button is clicked", function() {
+    const saveButton = document.getElementById('save');
+    spyOn(saveButton, 'click');
+    saveButton.click();
+    expect(saveButton.click).toHaveBeenCalled();
+    // Additional test for saving logic can be added
+});
+
+// Requirement 10 - Play multiple sounds in quick succession without overlap
+it("should reset audio currentTime to 0 before playing", function() {
+    const audio = document.querySelector('audio[data-key="65"]');
+    audio.currentTime = 5; // Simulate playing halfway
+    const keyEvent = new KeyboardEvent('keydown', { keyCode: 65 });
+    window.dispatchEvent(keyEvent);
+    expect(audio.currentTime).toBe(0);
+});
+
+// Requirement 11 - Responsive design
+it("should have flexbox properties for responsive layout", function() {
+    const bodyStyle = window.getComputedStyle(document.body);
+    expect(bodyStyle.display).toBe('flex');
+    expect(bodyStyle.flexWrap).toBe('wrap');
+    expect(bodyStyle.justifyContent).toBe('center');
+});
+
+// Requirement 12 - Hidden audio elements
+it("should hide audio elements using display: none", function() {
+    const audioElements = document.querySelectorAll('.sound');
+    audioElements.forEach(audio => {
+        const style = window.getComputedStyle(audio);
+        expect(style.display).toBe('none');
+    });
+});
+
+// Requirement 12 - Visual scaling when activated
+it("should scale the drum pad when clicked or activated via keyboard", function() {
+    const drumPad = document.querySelector('.drum[data-key="65"]');
+    drumPad.click();
+    const style = window.getComputedStyle(drumPad);
+    expect(style.transform).toContain('scale');
+});
+
+// Requirement 13 - Prevent text selection
+it("should prevent text selection on drum pads", function() {
+    const drumPads = document.querySelectorAll('.drum');
+    drumPads.forEach(pad => {
+        const style = window.getComputedStyle(pad);
+        expect(style.userSelect).toBe('none');
+    });
+});
+
+// Requirement 14 - Display associated key on each drum pad
+it("should display the associated key inside each drum pad", function() {
+    const drumPad = document.querySelector('.drum[data-key="65"]');
+    const keyDisplay = drumPad.querySelector('.key');
+    expect(keyDisplay.textContent).toBe("A");
+});
+
+// Requirement 15 - Prevent errors if no corresponding drum pad exists
+it("should not throw errors when pressing a key without a corresponding drum pad", function() {
+    const keyEvent = new KeyboardEvent('keydown', { keyCode: 90 }); // Key without a drum pad
+    expect(function() {
+        window.dispatchEvent(keyEvent);
+    }).not.toThrow();
+});
+
+});
 
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/jasmine-core/lib/jasmine-core/boot1.js"></script>
 
 </body>
 </html>

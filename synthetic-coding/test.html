@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Drum Kit with Web Audio API</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f3f3f3;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .drum-kit {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .drum {
+            width: 100px;
+            height: 100px;
+            margin: 10px;
+            border-radius: 50%;
+            background-color: #6c6f79;
+            box-shadow: 0 5px #2e2f33;
+            text-align: center;
+            line-height: 100px;
+            font-size: 24px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .drum:active, .playing {
+            transform: scale(1.1);
+            background-color: #ff4081;
+            box-shadow: 0 5px #ad0059;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="drum-kit">
+        <div data-sound="clap" class="drum">A</div>
+        <div data-sound="hihat" class="drum">S</div>
+        <div data-sound="kick" class="drum">D</div>
+        <div data-sound="openhat" class="drum">F</div>
+        <div data-sound="boom" class="drum">G</div>
+        <div data-sound="ride" class="drum">H</div>
+        <div data-sound="snare" class="drum">J</div>
+        <div data-sound="tom" class="drum">K</div>
+        <div data-sound="tink" class="drum">L</div>
+    </div>
+
+    <script>
+        // Create the audio context
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        // Sound sources mapped to drum types
+        const sounds = {
+            clap: 'https://www.myinstants.com/media/sounds/clap.mp3',
+            hihat: 'https://www.myinstants.com/media/sounds/hihat.mp3',
+            kick: 'https://www.myinstants.com/media/sounds/kick-bass.mp3',
+            openhat: 'https://www.myinstants.com/media/sounds/openhat.mp3',
+            boom: 'https://www.myinstants.com/media/sounds/boom.mp3',
+            ride: 'https://www.myinstants.com/media/sounds/ride.mp3',
+            snare: 'https://www.myinstants.com/media/sounds/snare.mp3',
+            tom: 'https://www.myinstants.com/media/sounds/tom.mp3',
+            tink: 'https://www.myinstants.com/media/sounds/tink.mp3',
+        };
+
+        // Function to play a sound using Web Audio API
+        function playSound(sound) {
+            const source = audioCtx.createBufferSource();
+            const request = new XMLHttpRequest();
+            request.open('GET', sounds[sound], true);
+            request.responseType = 'arraybuffer';
+            
+            request.onload = function() {
+                const audioData = request.response;
+                
+                audioCtx.decodeAudioData(audioData, function(buffer) {
+                    source.buffer = buffer;
+                    source.connect(audioCtx.destination);
+                    source.start(0);
+                });
+            };
+            request.send();
+        }
+
+        // Event handler for key presses and clicks
+        function handleInteraction(e) {
+            let sound = '';
+            if (e.type === 'keydown') {
+                const keyMap = {
+                    65: 'clap',
+                    83: 'hihat',
+                    68: 'kick',
+                    70: 'openhat',
+                    71: 'boom',
+                    72: 'ride',
+                    74: 'snare',
+                    75: 'tom',
+                    76: 'tink'
+                };
+                sound = keyMap[e.keyCode];
+                const drumElement = document.querySelector(`.drum[data-sound="${sound}"]`);
+                if (drumElement) {
+                    drumElement.classList.add('playing');
+                    setTimeout(() => drumElement.classList.remove('playing'), 100);
+                }
+            } else if (e.type === 'click') {
+                sound = e.target.getAttribute('data-sound');
+                e.target.classList.add('playing');
+                setTimeout(() => e.target.classList.remove('playing'), 100);
+            }
+            
+            if (sound) {
+                playSound(sound);
+            }
+        }
+
+        // Attach event listeners for both keyboard and mouse
+        window.addEventListener('keydown', handleInteraction);
+        document.querySelectorAll('.drum').forEach(drum => drum.addEventListener('click', handleInteraction));
+    </script>
+
+</body>
+</html>
