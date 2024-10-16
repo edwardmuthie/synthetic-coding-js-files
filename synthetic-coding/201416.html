@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Hello, World!</title>
+  </head>
+  <body>
+    <cite><a href="space.php?action=viewpro&amp;uid=8884217" target="_blank">5228080</a><img src="images/thankyou.gif" border="0" align="absmiddle">327                                                                             </cite>
+    <script>
+        // Get the cite element
+        const citeElement = document.querySelector('cite');
+
+        // Get the text content of the cite element
+        const citeText = citeElement.textContent;
+
+        // Use a regular expression to extract the number
+        const match = citeText.match(/\d+$/);
+
+        // If a match is found, parse the number as an integer
+        let number = null;
+        if (match) {
+        number = parseInt(match[0], 10);
+        console.log("aaaaaaaa: " + number)
+        }
+
+        // Log the number to the console
+        console.log(number); // Output: 327
+    </script>
+
+</body>
+</html>
